@@ -1,4 +1,4 @@
-const { cos, sin, PI, pow, abs } = Math
+const { sin, cos, PI, sqrt } = Math
 const TAU = 2 * PI
 const canvas = document.getElementsByTagName('canvas')[0]
 const _ = canvas.getContext('2d')
@@ -10,12 +10,10 @@ const height = canvas.height = window.innerHeight
   Data
 --- */
 
-const startingRho = 64
-
 const data = [
   createCirclesStructure(squareWave),
   createCirclesStructure(triangleWave),
-  createCirclesStructure(squareWave),
+  createCirclesStructure(sawtoothWave),
 ]
 
 function createCirclesStructure(fn) {
@@ -27,12 +25,13 @@ function createCirclesStructure(fn) {
 
 function squareWave() {
   const circles = []
+  const startingRho = 64
 
-  for (let i = 1; i < 126 + 1; i += 2) {
+  for (let i = 1; i < 128 + 1; i += 2) {
     circles.push({
       t: PI,
       r: startingRho / i,
-      a: i,
+      a: i * PI,
     })
   }
 
@@ -41,14 +40,36 @@ function squareWave() {
 
 function triangleWave() {
   const circles = []
+  const startingRho = 64
 
-  for (let i = 1; i < 126 + 1; i += 2) {
+  let rho = startingRho
+
+  for (let i = 0; i < 25; i++) {
     const n = 2 * i + 1
 
     circles.push({
-      t: PI,
-      r: startingRho * pow(-1, i) / (n * n),
+      t: i % 2 ? PI : 0,
+      r: rho,
       a: n,
+    })
+
+    rho = sqrt(rho)
+  }
+
+  return circles
+}
+
+function sawtoothWave() {
+  const circles = []
+  const startingRho = 64
+
+  for (let i = 1; i < 128; i += 1) {
+    const n = 2 * i + 1
+
+    circles.push({
+      t: 0,
+      r: startingRho / i,
+      a: i * TAU,
     })
   }
   return circles
@@ -84,7 +105,10 @@ function draw() {
   _.fillRect(0, 0, width, height)
 
   data.forEach(({ circles, points }, k) => {
-    let previousCoordinates = { x: width / 3, y: (k + 1) * height / (data.length + 1) }
+    let previousCoordinates = {
+      x: width / 3,
+      y: (k + 1) * height / (data.length + 1),
+    }
 
     circles.forEach(({ t, r }) => {
       const nextCoordinates = sumPoints(previousCoordinates, polarToCarthesian(t, r))
@@ -118,10 +142,8 @@ function draw() {
 
 function drawCircle(x, y, r, p) {
   _.strokeStyle = 'black'
-  _.save()
-  // _.translate(x, y)
   _.beginPath()
-  _.arc(x, y, abs(r), 0, TAU)
+  _.arc(x, y, r, 0, TAU)
   _.closePath()
   _.stroke()
   _.moveTo(x, y)
@@ -137,15 +159,8 @@ function drawPoint(x, y) {
   _.fill()
 }
 
-function tick() {
-  update()
-  draw()
-
-  window.requestAnimationFrame(tick)
-}
-
 /* ---
-  Methods
+  Utils
 --- */
 
 function sumPoints(a, b) {
@@ -164,6 +179,16 @@ function polarToCarthesian(theta, rho) {
 
 function distanceSquared(a, b) {
   return (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)
+}
+
+/* ---
+  Loop
+--- */
+
+function tick() {
+  update()
+  draw()
+  window.requestAnimationFrame(tick)
 }
 
 window.requestAnimationFrame(tick)

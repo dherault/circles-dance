@@ -1,4 +1,5 @@
 {
+  "dedicatedTo": "Cassandra",
   "name": "template-canvas",
   "version": "0.0.0",
   "description": "A template for most simple canvas-based projects",
