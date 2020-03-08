@@ -44,11 +44,11 @@ function triangleWave() {
   const circles = []
   const startingRho = 64
 
-  for (let i = 0; i < 32; i++) {
+  for (let i = 0; i < 16; i++) {
     const n = 2 * i + 1
 
     circles.push({
-      t: 0,
+      t: PI / 2,
       r: startingRho / (n * n),
       a: i % 2 ? n * PI : -n * PI,
     })
@@ -56,6 +56,25 @@ function triangleWave() {
 
   return circles
 }
+
+// function triangleWaveFactory(m = 2) {
+//   return () => {
+//     const circles = []
+//     const startingRho = 64
+
+//     for (let i = 0; i < 16; i++) {
+//       const n = 2 * i + 1
+
+//       circles.push({
+//         t: 0,
+//         r: 2 * m * m * startingRho / ((n * n) * (m - 1) * PI * PI),
+//         a: i % 2 ? n * (m - 1) * PI : -n * (m - 1) * PI,
+//       })
+//     }
+
+//     return circles
+//   }
+// }
 
 // function triangleWave() {
 //   const circles = []
