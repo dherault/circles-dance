@@ -11,15 +11,17 @@ const height = canvas.height = window.innerHeight
 --- */
 
 const data = [
-  createCirclesStructure(squareWave),
-  createCirclesStructure(triangleWave),
-  createCirclesStructure(sawtoothWave),
+  createCirclesStructure(squareWave, 'gold'),
+  createCirclesStructure(triangleWave, 'orange'),
+  createCirclesStructure(sawtoothWave, 'tomato'),
 ]
 
-function createCirclesStructure(fn) {
+function createCirclesStructure(fn, color) {
   return {
+    color,
     circles: fn(),
-    points: []
+    points: [],
+    resetFn: fn,
   }
 }
 
@@ -27,7 +29,7 @@ function squareWave() {
   const circles = []
   const startingRho = 64
 
-  for (let i = 1; i < 128 + 1; i += 2) {
+  for (let i = 1; i < 32 + 1; i += 2) {
     circles.push({
       t: PI,
       r: startingRho / i,
@@ -44,13 +46,13 @@ function triangleWave() {
 
   let rho = startingRho
 
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 32 / 4; i++) {
     const n = 2 * i + 1
 
     circles.push({
       t: i % 2 ? PI : 0,
       r: rho,
-      a: n,
+      a: n * PI,
     })
 
     rho = sqrt(rho)
@@ -63,13 +65,13 @@ function sawtoothWave() {
   const circles = []
   const startingRho = 64
 
-  for (let i = 1; i < 128; i += 1) {
+  for (let i = 1; i < 32; i += 1) {
     const n = 2 * i + 1
 
     circles.push({
       t: 0,
       r: startingRho / i,
-      a: i * TAU,
+      a: i * PI,
     })
   }
   return circles
@@ -101,19 +103,21 @@ function update() {
 
 function draw() {
   _.fillStyle = 'white'
-  _.strokeStyle = 'black'
   _.fillRect(0, 0, width, height)
 
-  data.forEach(({ circles, points }, k) => {
+  data.forEach(({ circles, points, color }, k) => {
+    _.strokeStyle = color
+
+    const initialHeight = (k + 1) * height / (data.length + 1)
     let previousCoordinates = {
       x: width / 3,
-      y: (k + 1) * height / (data.length + 1),
+      y: initialHeight,
     }
 
     circles.forEach(({ t, r }) => {
       const nextCoordinates = sumPoints(previousCoordinates, polarToCarthesian(t, r))
 
-      drawCircle(previousCoordinates.x, previousCoordinates.y, r, nextCoordinates)
+      drawCircleWithLine(previousCoordinates.x, previousCoordinates.y, r, nextCoordinates, color)
 
       previousCoordinates = nextCoordinates
     })
@@ -134,14 +138,23 @@ function draw() {
         _.stroke()
       }
       else {
-        drawPoint(p.x, p.y)
+        drawPoint(p.x, p.y, color)
       }
     })
+
   })
 }
 
-function drawCircle(x, y, r, p) {
-  _.strokeStyle = 'black'
+function drawDisk(x, y, r, color = 'black') {
+  _.fillStyle = color
+  _.beginPath()
+  _.arc(x, y, r, 0, TAU)
+  _.closePath()
+  _.fill()
+}
+
+function drawCircleWithLine(x, y, r, p, color = 'black') {
+  _.strokeStyle = color
   _.beginPath()
   _.arc(x, y, r, 0, TAU)
   _.closePath()
@@ -151,8 +164,8 @@ function drawCircle(x, y, r, p) {
   _.stroke()
 }
 
-function drawPoint(x, y) {
-  _.fillStyle = 'black'
+function drawPoint(x, y, color = 'black') {
+  _.fillStyle = color
   _.beginPath()
   _.arc(x, y, 0.5, 0, TAU)
   _.closePath()
