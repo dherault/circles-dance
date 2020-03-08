@@ -44,36 +44,52 @@ function triangleWave() {
   const circles = []
   const startingRho = 64
 
-  let rho = startingRho
-
-  for (let i = 0; i < 32 / 4; i++) {
+  for (let i = 0; i < 32; i++) {
     const n = 2 * i + 1
 
     circles.push({
-      t: i % 2 ? PI : 0,
-      r: rho,
-      a: n * PI,
+      t: 0,
+      r: startingRho / (n * n),
+      a: i % 2 ? n * PI : -n * PI,
     })
-
-    rho = sqrt(rho)
   }
 
   return circles
 }
+
+// function triangleWave() {
+//   const circles = []
+//   const startingRho = 64
+
+//   let rho = startingRho
+
+//   for (let i = 0; i < 32 / 4; i++) {
+//     const n = 2 * i + 1
+
+//     circles.push({
+//       t: i % 2 ? PI : 0,
+//       r: rho,
+//       a: n * PI,
+//     })
+
+//     rho = sqrt(rho)
+//   }
+
+//   return circles
+// }
 
 function sawtoothWave() {
   const circles = []
   const startingRho = 64
 
   for (let i = 1; i < 32; i += 1) {
-    const n = 2 * i + 1
-
     circles.push({
       t: 0,
       r: startingRho / i,
       a: i * PI,
     })
   }
+
   return circles
 }
 
@@ -143,14 +159,6 @@ function draw() {
     })
 
   })
-}
-
-function drawDisk(x, y, r, color = 'black') {
-  _.fillStyle = color
-  _.beginPath()
-  _.arc(x, y, r, 0, TAU)
-  _.closePath()
-  _.fill()
 }
 
 function drawCircleWithLine(x, y, r, p, color = 'black') {
